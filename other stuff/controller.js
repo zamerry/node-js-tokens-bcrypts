@@ -1,8 +1,6 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import {validationResult} from "express-validator"
-import roles from "../models/roles.js";
-import users from "../models/users.js";
 import config from "./config.js";
 import Users from "../models/users.js";
 import Roles from "../models/roles.js";
@@ -92,10 +90,13 @@ class Controller {
                 return res.status(400).json({message: "неверный пароль"})
             }
 
-            return res.status(200).json({message: "вход разрешен"})
+            // return res.status(200).json({message: "вход разрешен"})
+
+            const token = generateAccessToken(user._id, user.roles)
+            return res.json(token)
 
         } catch (e) {
-            return res.status(500).json({message: "неизвестная ошибка при регистрации пользователя"}, e)
+            return res.status(500).json({message: "неизвестная ошибка при регистрации пользователя", error: e.message})
         }
     }
 
@@ -104,7 +105,7 @@ class Controller {
             const find_users = await Users.find()
             return res.status(200).json(find_users)
         } catch (e) {
-            return res.status(500).json({message: "ошибка с регистрацией пользователя"})
+            return res.status(500).json({message: "ошибка при получении списков пользователей"})
         }
     }
 }
